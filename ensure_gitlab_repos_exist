@@ -1,0 +1,16 @@
+#! /usr/bin/env ruby
+
+require 'bundler'
+require 'gitlab'
+
+Gitlab.endpoint = 'https://gitlab.com/api/v4'
+
+github_repos = ARGV
+gitlab_repos = Gitlab.projects(owned: true).auto_paginate.map(&:name)
+missing = github_repos - gitlab_repos
+namespace_id = Gitlab.namespaces.find { |n| n.name == 'govuk' }.id
+
+missing.each do |r|
+  puts "Creating #{r}..."
+  Gitlab.create_project r, namespace_id: namespace_id, visibility: 'private'
+end
