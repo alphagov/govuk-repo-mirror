@@ -1,0 +1,30 @@
+#! /bin/bash
+
+base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo "Finding Github repos tagged with 'govuk'..."
+repos=$(${base_dir}/get_github_repos)
+
+echo "Ensuring repos exist in Gitlab..."
+${base_dir}/ensure_gitlab_repos_exist ${repos}
+
+[[ $(uname) == 'Darwin' ]] && md5=md5 || md5=md5sum
+
+for repo in ${repos}; do
+  echo -n "Checking if ${repo} is up to date... "
+  github_md5=$(git ls-remote --heads --tags https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} | $md5)
+  gitlab_md5=$(git ls-remote --heads --tags https://${GITLAB_API_PRIVATE_TOKEN}@gitlab.com/govuk/${repo}/ | $md5)
+
+  if [ ${github_md5} != ${gitlab_md5} ]; then
+    echo "updating"
+    if [ ! -d ${repo}.git ]; then
+      git init --bare ${repo}.git
+    fi
+
+    git="git --git-dir ${repo}.git"
+    ${git} fetch https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} +refs/heads/*:refs/heads/* --prune
+    ${git} push --mirror https://${GITLAB_API_PRIVATE_TOKEN}@gitlab.com/govuk/${repo}/
+  else
+    echo "ok"
+  fi
+done

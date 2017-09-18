@@ -1,0 +1,16 @@
+#! /usr/bin/env ruby
+
+require 'bundler'
+require 'octokit'
+
+client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+client.auto_paginate = true
+
+# We set this in order to retrieve topics from the GitHub API. Once this
+# comes out of beta, this line can be removed.
+client.default_media_type = 'application/vnd.github.mercy-preview+json'
+
+puts client.org_repos('alphagov')
+  .select { |r| r["topics"].include?("govuk") }
+  .map { |r| r["name"] }
+  .join("\n")
