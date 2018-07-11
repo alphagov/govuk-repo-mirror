@@ -5,17 +5,21 @@ base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Finding Github repos tagged with 'govuk'..."
 repos=$(${base_dir}/get_github_repos)
 
-echo "Ensuring repos exist in Gitlab..."
-${base_dir}/ensure_gitlab_repos_exist ${repos}
+echo "Ensuring repos exist in AWS CodeCommit..."
+${base_dir}/ensure_aws_repos_exist ${repos}
 
 [[ $(uname) == 'Darwin' ]] && md5=md5 || md5=md5sum
 
+git config --global credential.helper '!aws codecommit credential-helper $@'
+git config --global credential.UseHttpPath true
+
 for repo in ${repos}; do
   echo -n "Checking if ${repo} is up to date... "
-  github_md5=$(git ls-remote --heads --tags https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} | $md5)
-  gitlab_md5=$(git ls-remote --heads --tags https://${GITLAB_API_PRIVATE_TOKEN}@gitlab.com/govuk/${repo}/ | $md5)
 
-  if [ ${github_md5} != ${gitlab_md5} ]; then
+  github_md5=$(git ls-remote --heads --tags https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} | $md5 | cut -d" " -f1)
+  aws_cc_md5=$(git ls-remote --heads --tags https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/${repo} | $md5 | cut -d" " -f1)
+
+  if [ ${github_md5} != ${aws_cc_md5} ]; then
     echo "updating"
     if [ ! -d ${repo}.git ]; then
       git init --bare ${repo}.git
@@ -23,7 +27,7 @@ for repo in ${repos}; do
 
     git="git --git-dir ${repo}.git"
     ${git} fetch https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} +refs/heads/*:refs/heads/* --prune
-    ${git} push --mirror https://${GITLAB_API_PRIVATE_TOKEN}@gitlab.com/govuk/${repo}/
+    ${git} push --mirror https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/${repo}
   else
     echo "ok"
   fi
