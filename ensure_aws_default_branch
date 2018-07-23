@@ -14,11 +14,18 @@ aws_cc_client = Aws::CodeCommit::Client.new(
 
 MASTER_BRANCH = "master".freeze
 
-aws_cc_repos = aws_cc_client.list_repositories.repositories
+aws_cc_repos = []
+next_token = nil
 
-aws_cc_repos.each do |repo|
-  name = repo.repository_name
-  resp = aws_cc_client.get_repository(repository_name: name)
+loop do
+  aws_response = aws_cc_client.list_repositories(next_token: next_token)
+  aws_cc_repos << aws_response.repositories.map(&:repository_name)
+  next_token = aws_response.next_token
+  break unless next_token
+end
+
+aws_cc_repos.flatten.each do |repo_name|
+  resp = aws_cc_client.get_repository(repository_name: repo_name)
   default_branch = resp.repository_metadata.default_branch
   if default_branch && default_branch != MASTER_BRANCH
     puts "Repo #{repo_name} has default branch: #{default_branch}, updating to '#{MASTER_BRANCH}'"

@@ -10,8 +10,17 @@ aws_cc_client = Aws::CodeCommit::Client.new(
 )
 
 github_repos = ARGV
-aws_cc_repos = aws_cc_client.list_repositories.repositories
-missing = github_repos - aws_cc_repos.map(&:repository_name)
+aws_cc_repos = []
+next_token = nil
+
+loop do
+  aws_response = aws_cc_client.list_repositories(next_token: next_token)
+  aws_cc_repos << aws_response.repositories.map(&:repository_name)
+  next_token = aws_response.next_token
+  break unless next_token
+end
+
+missing = github_repos - aws_cc_repos.flatten
 
 missing.each do |r|
   puts "Creating #{r}..."
