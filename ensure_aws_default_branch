@@ -1,0 +1,27 @@
+#! /usr/bin/env ruby
+
+require 'bundler'
+require 'aws-sdk-codecommit'
+
+# Aws::CodeCommit::Client#create_repository doesn't set the default branch
+# This script is optionally used to update the default branch for existing repos.
+#
+aws_cc_client = Aws::CodeCommit::Client.new(
+  access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+  secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+  region: ENV['AWS_REGION'],
+)
+
+MASTER_BRANCH = "master".freeze
+
+aws_cc_repos = aws_cc_client.list_repositories.repositories
+
+aws_cc_repos.each do |repo|
+  name = repo.repository_name
+  resp = aws_cc_client.get_repository(repository_name: name)
+  default_branch = resp.repository_metadata.default_branch
+  if default_branch && default_branch != MASTER_BRANCH
+    puts "Repo #{repo_name} has default branch: #{default_branch}, updating to '#{MASTER_BRANCH}'"
+    aws_cc_client.update_default_branch(default_branch_name: MASTER_BRANCH, repository_name: repo_name)
+  end
+end

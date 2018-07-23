@@ -16,15 +16,4 @@ missing = github_repos - aws_cc_repos.map(&:repository_name)
 missing.each do |r|
   puts "Creating #{r}..."
   aws_cc_client.create_repository({repository_name: r})
-  aws_cc_client.update_default_branch(default_branch_name: "master", repository_name: r)
-end
-
-aws_cc_repos.each do |repo|
-  name = repo.repository_name
-  resp = aws_cc_client.get_repository(repository_name: name)
-  default_branch = resp.repository_metadata.default_branch
-  if default_branch != "master"
-    puts "Repo #{name} has default branch: #{default_branch}, needs updating to 'master'"
-    #aws_cc_client.update_default_branch(default_branch_name: "master", repository_name: name)
-  end
 end
