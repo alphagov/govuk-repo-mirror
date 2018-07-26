@@ -10,10 +10,11 @@ ${base_dir}/ensure_aws_repos_exist ${repos}
 
 [[ $(uname) == 'Darwin' ]] && md5=md5 || md5=md5sum
 
-git config --global credential.helper '!aws codecommit credential-helper $@'
-git config --global credential.UseHttpPath true
-
 for repo in ${repos}; do
+
+  git config --global credential.helper '!aws codecommit credential-helper $@'
+  git config --global credential.UseHttpPath true
+
   echo -n "Checking if ${repo} is up to date... "
 
   github_md5=$(git ls-remote --heads --tags https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} | $md5 | cut -d" " -f1)
