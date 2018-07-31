@@ -3,6 +3,17 @@ GEM
   specs:
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    aws-eventstream (1.0.1)
+    aws-partitions (1.95.0)
+    aws-sdk-codecommit (1.4.0)
+      aws-sdk-core (~> 3)
+      aws-sigv4 (~> 1.0)
+    aws-sdk-core (3.22.1)
+      aws-eventstream (~> 1.0)
+      aws-partitions (~> 1.0)
+      aws-sigv4 (~> 1.0)
+      jmespath (~> 1.0)
+    aws-sigv4 (1.0.3)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     gitlab (4.2.0)
@@ -10,6 +21,7 @@ GEM
       terminal-table
     httparty (0.15.6)
       multi_xml (>= 0.5.2)
+    jmespath (1.4.0)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
     octokit (4.7.0)
@@ -26,8 +38,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aws-sdk-codecommit
   gitlab
   octokit
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
