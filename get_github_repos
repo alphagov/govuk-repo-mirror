@@ -3,7 +3,7 @@
 require 'bundler'
 require 'octokit'
 
-client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
 client.auto_paginate = true
 
 # We set this in order to retrieve topics from the GitHub API. Once this

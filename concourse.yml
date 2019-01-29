@@ -1,0 +1,62 @@
+---
+resources:
+  - name: mirror-repos-git
+    type: git
+    source:
+      uri: https://github.com/alphagov/govuk-repo-mirror.git
+      branch: master
+
+  - name: every-two-hours
+    type: time
+    source:
+      interval: 2h
+
+
+jobs:
+  - name: mirror-repos
+    serial: true
+    plan:
+      - get: mirror-repos-git
+        trigger: true
+
+      - get: every-two-hours
+        trigger: true
+
+      - task: get-repos
+        timeout: 30m
+        config:
+          params:
+            ENSURE_DEFAULT_BRANCH: true
+            GITHUB_ACCESS_TOKEN: ((mirror_repos_github_api_token))
+            ROLE_ARN: arn:aws:iam::((govuk_tools_account_id)):role/govuk-concourse-codecommit-role
+            GIT_SSH_PRIVATE_KEY: ((git_ssh_private_key))
+            AWS_CODECOMMIT_USER_ID: ((aws_codecommit_user_id))
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ruby
+              tag: 2.6.0
+          inputs:
+            - name: mirror-repos-git
+          run:
+            dir: mirror-repos-git
+            path: bash
+            args:
+              - -c
+              - |
+                set -ueo pipefail
+
+                apt-get update  --yes
+                apt-get install --yes awscli
+
+                echo "$GIT_SSH_PRIVATE_KEY" \
+                | base64 --decode           \
+                | openssl rsa -inform DER   \
+                > /tmp/git_ssh_key
+
+                chmod 400 /tmp/git_ssh_key
+                export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i /tmp/git_ssh_key"
+
+                bundle install
+                ./mirror_repos
