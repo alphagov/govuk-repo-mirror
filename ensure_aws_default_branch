@@ -7,9 +7,10 @@ require 'aws-sdk-codecommit'
 # This script is optionally used to update the default branch for existing repos.
 #
 aws_cc_client = Aws::CodeCommit::Client.new(
-  access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-  secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-  region: ENV['AWS_REGION'],
+  access_key_id: ENV.fetch('AWS_ACCESS_KEY_ID'),
+  secret_access_key: ENV.fetch('AWS_SECRET_ACCESS_KEY'),
+  session_token: ENV.fetch('AWS_SESSION_TOKEN', nil),
+  region: ENV.fetch('AWS_REGION'),
 )
 
 MASTER_BRANCH = "master".freeze

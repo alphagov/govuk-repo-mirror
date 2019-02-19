@@ -1,6 +1,20 @@
 #! /bin/bash
 
+set -ueo pipefail
+
+export AWS_REGION=eu-west-2
+export AWS_DEFAULT_REGION=eu-west-2
+
 base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+function with_credentials {
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_SESSION_TOKEN
+  eval $(./set_credentials)
+}
+
+with_credentials
 
 echo "Finding Github repos tagged with 'govuk'..."
 repos=$(${base_dir}/get_github_repos)
@@ -12,6 +26,8 @@ ${base_dir}/ensure_aws_repos_exist ${repos}
 
 for repo in ${repos}; do
 
+  with_credentials
+
   git config --global credential.helper '!aws codecommit credential-helper $@'
   git config --global credential.UseHttpPath true
 
@@ -22,13 +38,30 @@ for repo in ${repos}; do
 
   if [ ${github_md5} != ${aws_cc_md5} ]; then
     echo "updating"
-    if [ ! -d ${repo}.git ]; then
-      git init --bare ${repo}.git
-    fi
-
     git="git --git-dir ${repo}.git"
-    ${git} fetch https://${GITHUB_ACCESS_TOKEN}@github.com/alphagov/${repo} +refs/heads/*:refs/heads/* --prune
-    ${git} push --mirror https://git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/${repo}
+
+    github_remote="ssh://git@github.com/alphagov/${repo}"
+    aws_remote="ssh://${AWS_CODECOMMIT_USER_ID}@git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/${repo}"
+
+    echo "Fetching ${repo}"
+    ${git} clone --mirror "${github_remote}"
+
+    echo "Doing some cleanup for ${repo}"
+    ${git} reflog expire --expire-unreachable=now --all
+    ${git} gc            --prune=now
+
+    echo "Pushing ${repo} --tags --force"
+    ${git} push --force --quiet --tags "${aws_remote}"
+
+    echo "Pushing ${repo} --all --force"
+    ${git} push --force --quiet --all "${aws_remote}"
+
+    echo "Manually pushing ${repo}"
+    ${git} push ${aws_remote} +refs/remotes/origin/*:refs/heads/*
+    ${git} push ${aws_remote} +refs/tags/*:refs/tags/*
+
+    echo "Deleting local copy ${repo}.git"
+    rm -rf "${repo}.git"
   else
     echo "ok"
   fi
