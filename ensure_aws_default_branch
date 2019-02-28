@@ -26,10 +26,14 @@ loop do
 end
 
 aws_cc_repos.flatten.each do |repo_name|
-  resp = aws_cc_client.get_repository(repository_name: repo_name)
-  default_branch = resp.repository_metadata.default_branch
-  if default_branch && default_branch != MASTER_BRANCH
-    puts "Repo #{repo_name} has default branch: #{default_branch}, updating to '#{MASTER_BRANCH}'"
-    aws_cc_client.update_default_branch(default_branch_name: MASTER_BRANCH, repository_name: repo_name)
+  begin
+    resp = aws_cc_client.get_repository(repository_name: repo_name)
+    default_branch = resp.repository_metadata.default_branch
+    if default_branch && default_branch != MASTER_BRANCH
+      puts "Repo #{repo_name} has default branch: #{default_branch}, updating to '#{MASTER_BRANCH}'"
+      aws_cc_client.update_default_branch(default_branch_name: MASTER_BRANCH, repository_name: repo_name)
+    end
+  rescue Aws::CodeCommit::Errors::BranchDoesNotExistException
+    puts "Default branch not set since '#{MASTER_BRANCH}' does not exist"
   end
 end
