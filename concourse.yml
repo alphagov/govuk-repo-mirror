@@ -76,10 +76,11 @@ jobs:
           put: govuk-platform-health-slack
           params:
             channel: '#govuk-2ndline'
-            username: cd
+            username: 'GOV.UK Repo Mirror'
             icon_emoji: ':concourse:'
             silent: true
             text: |
               :kaboom:
-              operations/mirror-repos has failed
-              http://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+              The operations/mirror-repos Concourse job has failed
+              Failed build: http://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+              See https://docs.publishing.service.gov.uk/manual/repository-mirroring.html for more details of this job.
