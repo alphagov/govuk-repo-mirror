@@ -13,10 +13,12 @@ resources:
       uri: https://github.com/alphagov/govuk-repo-mirror.git
       branch: master
 
-  - name: every-two-hours
+  - name: every-two-hours-7am-to-9pm
     type: time
     source:
       interval: 2h
+      start: 7:00 AM
+      stop: 9:00 PM
 
   - name: govuk-platform-health-slack
     type: slack-notification
@@ -31,7 +33,7 @@ jobs:
       - get: mirror-repos-git
         trigger: true
 
-      - get: every-two-hours
+      - get: every-two-hours-7am-to-9pm
         trigger: true
 
       - task: get-repos
