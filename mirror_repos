@@ -65,8 +65,11 @@ for repo in ${repos}; do
   else
     echo "ok"
   fi
+  
+  sleep 2
 done
 
 if [ "$ENSURE_DEFAULT_BRANCH" == "true" ]; then
+  sleep 10
   ${base_dir}/ensure_aws_default_branch
 fi
