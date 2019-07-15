@@ -27,6 +27,7 @@ end
 
 aws_cc_repos.flatten.each do |repo_name|
   begin
+    puts "Getting current default branch for #{repo_name} repo"
     resp = aws_cc_client.get_repository(repository_name: repo_name)
     default_branch = resp.repository_metadata.default_branch
     if default_branch && default_branch != MASTER_BRANCH
