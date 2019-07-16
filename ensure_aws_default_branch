@@ -37,4 +37,6 @@ aws_cc_repos.flatten.each do |repo_name|
   rescue Aws::CodeCommit::Errors::BranchDoesNotExistException
     puts "Default branch not set since '#{MASTER_BRANCH}' does not exist"
   end
+  
+  sleep 2
 end
