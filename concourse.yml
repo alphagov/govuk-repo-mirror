@@ -20,7 +20,7 @@ resources:
       start: 7:00 AM
       stop: 9:00 PM
 
-  - name: govuk-platform-health-slack
+  - name: govuk-2ndline-slack
     type: slack-notification
     source:
       url: ((govuk_platform_health_slack_webhook_url))
@@ -75,7 +75,7 @@ jobs:
                 bundle install
                 ./mirror_repos
         on_failure:
-          put: govuk-platform-health-slack
+          put: govuk-2ndline-slack
           params:
             channel: '#govuk-2ndline'
             username: 'GOV.UK Repo Mirror'
