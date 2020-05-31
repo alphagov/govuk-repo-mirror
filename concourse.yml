@@ -27,6 +27,13 @@ resources:
 
 
 jobs:
+  - name: update-pipeline
+    plan:
+      - get: git-master
+        trigger: true
+      - set_pipeline: operations
+        file: git-master/concourse.yml
+
   - name: mirror-repos
     serial: true
     plan:
