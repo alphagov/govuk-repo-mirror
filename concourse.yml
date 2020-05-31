@@ -50,7 +50,7 @@ jobs:
             type: docker-image
             source:
               repository: ruby
-              tag: 2.6.0
+              tag: 2.6.6
           inputs:
             - name: mirror-repos-git
           run:

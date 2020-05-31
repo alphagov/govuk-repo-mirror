@@ -30,7 +30,8 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk-codecommit
+  aws-sdk-core
   octokit
 
 BUNDLED WITH
-   1.16.0
+   1.17.2
