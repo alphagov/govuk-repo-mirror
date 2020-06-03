@@ -20,13 +20,20 @@ resources:
       start: 7:00 AM
       stop: 9:00 PM
 
-  - name: govuk-platform-health-slack
+  - name: govuk-2ndline-slack
     type: slack-notification
     source:
       url: ((govuk_platform_health_slack_webhook_url))
 
 
 jobs:
+  - name: update-pipeline
+    plan:
+      - get: git-master
+        trigger: true
+      - set_pipeline: operations
+        file: git-master/concourse.yml
+
   - name: mirror-repos
     serial: true
     plan:
@@ -50,7 +57,7 @@ jobs:
             type: docker-image
             source:
               repository: ruby
-              tag: 2.6.0
+              tag: 2.6.6
           inputs:
             - name: mirror-repos-git
           run:
@@ -75,7 +82,7 @@ jobs:
                 bundle install
                 ./mirror_repos
         on_failure:
-          put: govuk-platform-health-slack
+          put: govuk-2ndline-slack
           params:
             channel: '#govuk-2ndline'
             username: 'GOV.UK Repo Mirror'
