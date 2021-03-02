@@ -1,4 +1,16 @@
 ---
+
+#
+# NOTE: There's a Grafana alert set up for the reliability of this pipeline:
+#
+#       https://grafana.monitoring.cd.gds-reliability.engineering/d/1go_x9sMz/concourse-alerts?orgId=1
+#
+#       This will alert #govuk-2ndline if this job's reliability drops below
+#       70% over the course of a day. It relies on the name of the pipeline
+#       (operations) and the task (mirror-repos). The #re-autom8 team can give
+#       you edit access to Grafana if you need to update the alert.
+#
+
 resource_types:
   - name: slack-notification
     type: docker-image
@@ -85,15 +97,4 @@ jobs:
 
                 bundle install
                 ./mirror_repos
-        on_failure:
-          put: govuk-2ndline-slack
-          params:
-            channel: '#govuk-2ndline'
-            username: 'GOV.UK Repo Mirror'
-            icon_emoji: ':concourse:'
-            silent: true
-            text: |
-              :kaboom:
-              The operations/mirror-repos Concourse job has failed
-              Failed build: http://cd.gds-reliability.engineering/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
-              See https://docs.publishing.service.gov.uk/manual/repository-mirroring.html for more details of this job.
+
