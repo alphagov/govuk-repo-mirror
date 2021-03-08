@@ -31,10 +31,10 @@ resources:
 jobs:
   - name: update-pipeline
     plan:
-      - get: git-master
+      - get: mirror-repos-git
         trigger: true
       - set_pipeline: operations
-        file: git-master/concourse.yml
+        file: mirror-repos-git/concourse.yml
 
   - name: mirror-repos
     serial: true
