@@ -46,6 +46,7 @@ jobs:
         trigger: true
 
       - task: get-repos
+        attempts: 2
         timeout: 90m
         config:
           params:
