@@ -47,7 +47,7 @@ jobs:
 
       - task: get-repos
         attempts: 2
-        timeout: 90m
+        timeout: 2h
         config:
           params:
             ENSURE_DEFAULT_BRANCH: true
