@@ -7,15 +7,6 @@ export AWS_DEFAULT_REGION=eu-west-2
 
 base_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-function with_credentials {
-  unset AWS_ACCESS_KEY_ID
-  unset AWS_SECRET_ACCESS_KEY
-  unset AWS_SESSION_TOKEN
-  eval $(./set_credentials)
-}
-
-with_credentials
-
 echo "Finding Github repos tagged with 'govuk'..."
 repos=$(${base_dir}/get_github_repos)
 
@@ -65,7 +56,7 @@ for repo in ${repos}; do
   else
     echo "ok"
   fi
-  
+
   sleep 2
 done
 
