@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'bundler'
+require 'bundler/setup'
 require 'aws-sdk-codecommit'
 
 aws_cc_client = Aws::CodeCommit::Client.new(

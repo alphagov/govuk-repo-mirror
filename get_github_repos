@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'bundler'
+require 'bundler/setup'
 require 'octokit'
 
 client = Octokit::Client.new(access_token: ENV.fetch('GITHUB_ACCESS_TOKEN'))
