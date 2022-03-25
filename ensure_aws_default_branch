@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'bundler'
+require 'bundler/setup'
 require 'aws-sdk-codecommit'
 
 # Aws::CodeCommit::Client#create_repository doesn't set the default branch
