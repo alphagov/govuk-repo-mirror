@@ -11,6 +11,6 @@ client.auto_paginate = true
 client.default_media_type = 'application/vnd.github.mercy-preview+json'
 
 puts client.org_repos('alphagov')
-  .select { |r| r["topics"].include?("govuk") }
+  .select { |r| !r["archived"] && r["topics"].include?("govuk") }
   .map { |r| r["name"] }
   .join("\n")
