@@ -53,15 +53,14 @@ for repo in ${repos}; do
     ${git} reflog expire --expire-unreachable=now --all
     ${git} gc            --prune=now
 
-    echo "Pushing ${repo} --tags --force"
-    ${git} push --force --quiet --tags "${aws_remote}"
+    echo "Pushing latest ${repo} tags"
+    ${git} push "${aws_remote}" --force $(git for-each-ref --sort=taggerdate --format '%(refname:short)' refs/tags | tail -4000 | tr '\n' ' ')
 
-    echo "Pushing ${repo} --all --force"
+    echo "Pushing all ${repo} repo branches"
     ${git} push --force --quiet --all "${aws_remote}"
 
-    echo "Manually pushing ${repo}"
+    echo "Manually pushing ${repo} git heads information"
     ${git} push ${aws_remote} +refs/remotes/origin/*:refs/heads/*
-    ${git} push ${aws_remote} +refs/tags/*:refs/tags/*
 
     echo "Deleting local copy ${repo}.git"
     rm -rf "${repo}.git"
