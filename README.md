@@ -5,7 +5,7 @@ Ensures all repositories tagged with `govuk` in the alphagov organisation in Git
 We use AWS CodeCommit so we can still [deploy in the event that GitHub.com is down][github-down]
 . We also use the private repositories on AWS CodeCommit in order to fix any [security vulnerabilities without disclosing them][security-deployments].
 
-This script will ensure every repository tagged with `govuk` on Github is mirrored to AWS CodeCommit. It will then synchronise all branches and tags, including removing branches that have been deleted in GitHub. In runs periodically in [Concourse][concourse].
+This script will ensure every non-archived repository tagged with `govuk` on Github is mirrored to AWS CodeCommit. It will then synchronise all branches and the most recent tags, including removing branches that have been deleted in GitHub. In runs periodically in [Jenkins][jenkins].
 
 **Warning:** If you need to work on a branch in private on AWS CodeCommit, this script must be prevented from running. If it runs and the branch you're working on does not exist in GitHub, it will be removed from AWS CodeCommit. The easiest way to prevent this is to untag the repository in GitHub.
 
@@ -31,4 +31,4 @@ $ ./mirror_repos
 
 [github-down]: https://docs.publishing.service.gov.uk/manual/github-unavailable.html
 [security-deployments]: https://docs.publishing.service.gov.uk/manual/deploy-fixes-for-a-security-vulnerability.html
-[concourse]: https://cd.gds-reliability.engineering/teams/govuk-tools/pipelines/operations/jobs/mirror-repos
+[jenkins]: https://deploy.integration.publishing.service.gov.uk/job/Mirror_Github_Repositories/
