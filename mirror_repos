@@ -43,6 +43,9 @@ for repo in ${repos}; do
     github_remote="ssh://git@github.com/alphagov/${repo}"
     aws_remote="ssh://${AWS_CODECOMMIT_USER_ID}@git-codecommit.${AWS_REGION}.amazonaws.com/v1/repos/${repo}"
 
+    echo "Cleaning the workspace"
+    rm -rf "${repo}.git"
+
     echo "Fetching ${repo}"
     ${git} clone --mirror "${github_remote}"
 
@@ -50,22 +53,21 @@ for repo in ${repos}; do
     ${git} reflog expire --expire-unreachable=now --all
     ${git} gc            --prune=now
 
-    echo "Pushing ${repo} --tags --force"
-    ${git} push --force --quiet --tags "${aws_remote}"
+    echo "Pushing latest ${repo} tags"
+    ${git} push "${aws_remote}" --force $(git for-each-ref --sort=taggerdate --format '%(refname:short)' refs/tags | tail -4000 | tr '\n' ' ')
 
-    echo "Pushing ${repo} --all --force"
+    echo "Pushing all ${repo} repo branches"
     ${git} push --force --quiet --all "${aws_remote}"
 
-    echo "Manually pushing ${repo}"
+    echo "Manually pushing ${repo} git heads information"
     ${git} push ${aws_remote} +refs/remotes/origin/*:refs/heads/*
-    ${git} push ${aws_remote} +refs/tags/*:refs/tags/*
 
     echo "Deleting local copy ${repo}.git"
     rm -rf "${repo}.git"
   else
     echo "ok"
   fi
-  
+
   sleep 2
 done
 

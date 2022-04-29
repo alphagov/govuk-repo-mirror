@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 
-require 'bundler'
+require 'bundler/setup'
 require 'aws-sdk-codecommit'
 
 aws_cc_client = Aws::CodeCommit::Client.new(
@@ -26,4 +26,5 @@ missing = github_repos - aws_cc_repos.flatten
 missing.each do |r|
   puts "Creating #{r}..."
   aws_cc_client.create_repository({repository_name: r})
+  sleep 5
 end
