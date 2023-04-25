@@ -1,5 +1,9 @@
 # GOV.UK Repository Mirrorer
 
+**⚠️ Repository retired**: This repository has been retired in favor of functionality in [govuk-infrastructure](https://github.com/alphagov/govuk-infrastructure). CodeCommit repositories are now [managed using Terraform](https://github.com/alphagov/govuk-infrastructure/blob/3a245e80b2ba8ba9f24a326e39532c9443cbc5a6/terraform/deployments/github/mirror.tf#L10) and the synchronization is done by the [`mirror-repo` GitHub Action](https://github.com/alphagov/govuk-infrastructure/blob/3a245e80b2ba8ba9f24a326e39532c9443cbc5a6/.github/workflows/mirror-repos.yml#L1). 
+
+---
+
 Ensures all repositories tagged with `govuk` in the alphagov organisation in GitHub.com are mirrored to AWS CodeCommit.
 
 We use AWS CodeCommit so we can still [deploy in the event that GitHub.com is down][github-down]
