@@ -19,9 +19,6 @@ with_credentials
 echo "Finding Github repos tagged with 'govuk'..."
 repos=$(${base_dir}/get_github_repos)
 
-echo "Ensuring repos exist in AWS CodeCommit..."
-${base_dir}/ensure_aws_repos_exist ${repos}
-
 [[ $(uname) == 'Darwin' ]] && md5=md5 || md5=md5sum
 
 for repo in ${repos}; do
@@ -70,8 +67,3 @@ for repo in ${repos}; do
 
   sleep 2
 done
-
-if [ "$ENSURE_DEFAULT_BRANCH" == "true" ]; then
-  sleep 10
-  ${base_dir}/ensure_aws_default_branch
-fi
